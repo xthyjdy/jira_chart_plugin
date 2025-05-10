@@ -1,0 +1,97 @@
+{namespace Dashboard.Item.Tutorial.Templates}
+
+/**
+* @param pluginName
+* @param version
+* @param message
+*/
+{template .Static}
+    <div id="dynamic-content" data-my="{$message}" />
+    <div>Welcome to <span class="aui-lozenge aui-lozenge-success">{$pluginName}</span> v{$version}!</div>
+    <!-- <div>message: {$message}</div> -->
+{/template}
+
+/**
+* @param issues
+*/
+{template .IssueList}
+   <table class="aui">
+       <thead>
+           <tr>
+               <th id="basic-number"></th>
+               <th id="basic-fname">Issue key</th>
+               <th id="basic-lname">Due date</th>
+           </tr>
+       </thead>
+              <tbody>
+       {foreach $issue in $issues}
+                    <tr>
+                        <td headers="basic-number"><img src="{$issue.fields.issuetype.iconUrl}"/></td>
+                        <td headers="basic-fname">{$issue.key}</td>
+                        <td headers="basic-lname">{$issue.fields.duedate}</td>
+                    </tr>
+       {/foreach}
+       </tbody>
+   </table>
+   <div class="buttons-container">
+       <div class="buttons">
+           <input class="button submit" type="submit" value="Refresh">
+       </div>
+   </div>
+{/template}
+/**
+*
+*/
+{template .Empty}
+   <canvas id="chart" width="200" height="100"></canvas>
+{/template}
+
+/**
+* configuration
+*/
+{template .Configuration}
+   <form class="aui my_form">
+        <!-- empty user input element -->
+        <div id="user_input_example" class="dis">
+		    <label for="uq_">*User Query </label>
+			<input class="text medium-field" type="text" id="uq_" name="uq_"
+				value="created >= -500d AND created <= -300d" />
+			<div class="description">Syntax: Edit Query (...)</div>
+		</div>
+        <!-- end of empty user input element -->
+       <div id="user_input_container" class="field-group">
+           <!-- <label for="due-date-input">Due Date
+               <span class="aui-icon icon-required">(required)</span></label> -->
+           <input class="text medium-field" type="hidden" value="3d"
+                  id="due-date-input" name="due-date-input" placeholder="3d">
+           <div class="description dis">Syntax: 3(d|w|m) </div>
+
+           <label for="uq_1">User Query 1
+               <span class="aui-icon icon-required">(required)</span></label>
+           <input class="text medium-field" type="text" id="uq_1" name="uq_1"
+                value="created >= -500d AND created <= -300d" />
+           <div class="description">Syntax: Edit Query (...)</div>
+
+           <label for="uq_2">User Query 2
+               <span class="aui-icon icon-required">(required)</span></label>
+           <input class="text medium-field" type="text" id="uq_2" name="uq_2"
+                value="created >= -308d AND created <= -300d" />
+           <div class="description">Syntax: Edit Query (...)</div>
+
+           <label for="uq_3">User Query 3
+               <span class="aui-icon icon-required">(required)</span></label>
+           <input class="text medium-field" type="text" id="uq_3" name="uq_3"
+                value="created >= -800d AND created <= -100d" />
+           <div class="description">Syntax: Edit Query (...)</div>
+
+       </div>
+       <div class="buttons-container">
+           <div class="buttons">
+               <input class="button submit" type="submit" value="Save" id="comment-save-button">
+               <a class="cancel" href="#">Cancel</a>
+               <!-- button for adding new user input button -->
+               <span id="add_input" class="my_jira_button">+</span>
+           </div>
+       </div>
+   </form>
+{/template}

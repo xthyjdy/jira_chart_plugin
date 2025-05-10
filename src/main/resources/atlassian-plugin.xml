@@ -1,0 +1,49 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="dashboard-item-tutorial"/>
+
+    <!-- add our web resources -->
+    <web-resource key="dashboard-item-tutorial-resources" name="dashboard-item-tutorial Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <transformation extension="soy">
+            <transformer key="soyTransformer"/>
+        </transformation>
+        <resource type="download" name="dashboard-item-tutorial.css" location="/css/dashboard-item-tutorial.css"/>
+        <!-- added chart.min.js lib localy -->
+        <resource type="download" name="chart_lib.js" location="/js/chart_lib.js"/>
+        <resource type="download" name="dashboard-item-tutorial.js" location="/js/dashboard-item-tutorial.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <resource type="download" location="soy/dashboard-item.soy" name="soy/dashboard-item.soy.js"/>
+        <resource type="soy" location="/soy/dashboard-item.soy" name="Dashboard.Item.Tutorial.Templates.Static"/>
+        <context>atl.dashboard</context>
+        <context>dashboard-item-tutorial</context>
+    </web-resource>
+
+    <dashboard-item key="new-dashboard-item"
+            i18n-name-key="com.example.plugins.tutorial.dashboard.item.title"
+            configurable="true">
+        <definition>
+            <title key="com.example.plugins.tutorial.dashboard.item.title"/>
+            <categories>
+                <category>Jira</category>
+            </categories>
+            <author>
+                <name>Author's name</name>
+            </author>
+            <thumbnail location="/download/resources/${atlassian.plugin.key}:dashboard-item-tutorial-resources/images/pluginLogo.png"/>
+        </definition>
+        <description key="com.example.plugins.tutorial.dashboard.item.description"/>
+        <resource name="view" type="soy" location=":dashboard-item-tutorial-resources/Dashboard.Item.Tutorial.Templates.Static"/>
+        <context-provider class="com.example.plugins.tutorial.DashboardItemContextProvider"/>
+         <amd-module>dashboard-items/tutorial</amd-module>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
+    </dashboard-item>
+</atlassian-plugin>
