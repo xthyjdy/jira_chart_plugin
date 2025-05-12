@@ -6,30 +6,35 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
     const DEBUG = true;//setup environment mode
     const VALUE_TYPE = 1;
     const FUNC_TYPE = 2;
+    const QUERY_TYPE = 3;
+    const NAME_TYPE = 4;
     const EMPTY_STR = '';
-    var cachedFormData = [];//storing data from form
-    let userInputIDS = ['uq_1', 'uq_2', 'uq_3'];//base inputs with query for creating api request
     const USER_INPUT_EXAMPLE_ID = '#user_input_example';//if of user input example stub
     const INPUT_ID_BASE_LABEL = 'uq_';//base part of user input
+    let cachedFormData = [];//storing data from form
     let elIdSequence = 4;//id of new element; starts from last existed base user inputs
+    let userInputIDS = ['uq_1', 'uq_2', 'uq_3'];//base inputs with query for creating api request
 
     /**
-     * Input Handler - wrap and return array with inputs data/attributes/values/api response
+     * Input Handler - wrap and return array with inputs data/attributes/values/api/etc response
      * @param type - specified type of wrapper we hope to get
      * @param chartData - data of inputs
      * @returns array - wrapped data
      */
     function inputHandler(type, chartData) {
-        let arrayWrapper = [];
-        if (VALUE_TYPE == type) {//return values from api response
-            return userInputIDS.map(function (inputID) {
-                return chartData[inputID];
-            });
-        } else if (FUNC_TYPE == type) {//
-            return userInputIDS.map(function (inputID) {
+        if (!type) return;//type didn't specified
+        
+        if (NAME_TYPE == type) { return userInputIDS; }//return user inputs names
+        
+        return userInputIDS.map(function (inputID) {
+            if (VALUE_TYPE == type) {//return values from api response
+                return chartData[inputID]['total'];
+            } else if (QUERY_TYPE == type) {//return user query (values of form inputs)
+                return chartData[inputID]['user_query'];
+            } else if (FUNC_TYPE == type) {//return functions for get api response
                 return fetchByQuery(inputID);
-            });
-        }
+            } 
+        });
     }
 
     /**
@@ -39,14 +44,14 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
      */
     function fetchByQuery(inputID) {
         let apiRequest = EMPTY_STR;//for api request
+        let userQuery = cachedFormData[inputID];//getting query which user specified for current form input
         if (DEBUG) {
             apiRequest = 'http://vasiliy.ho.ua/api/index.php?chart=1&' + inputID + '=1';
         } else {
-            if (cachedFormData[inputID]) {
-                apiRequest =
-                    'https://k5120.pixsoftware.de/jira/rest/api/2/search/?jql=' + cachedFormData[inputID] + ' ORDER BY created DESC';
+            if (userQuery) {
+apiRequest = 'https://k5120.pixsoftware.de/jira/rest/api/2/search/?jql=' + userQuery + ' ORDER BY created DESC';
             } else {
-                console.log('___err of inputValue: ' + inputID + "; " + cachedFormData[inputID]);
+                console.log('___err of inputValue: ' + inputID + "; " + userQuery);
             }
         }
         console.log('___apiRequest for ' + inputID + ': ' + apiRequest);
@@ -59,7 +64,8 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
                 return {
                     // url: response.url,
                     data: data,
-                    id: inputID, 
+                    id: inputID,
+                    user_query: userQuery
                 };
             });
         });
@@ -80,18 +86,27 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
             type: 'bar',
             data: {
                 // labels: [ chartData['uq_1'], chartData['uq_2'], chartData['uq_3'] ],
-                labels: inputHandler(VALUE_TYPE, chartData),//set array with queries response (array[..., ..., ...])
+                labels: inputHandler(NAME_TYPE, chartData),//set array with input names(id's) (array[..., ..., ...])
                 datasets: [{
                     label: '# data from queries',//chart title
                     data: inputHandler(VALUE_TYPE, chartData),//set array with queries response (array[..., ..., ...])
-                    backgroundColor: ['blue', 'yellow', 'green'],//row colors
+                    // backgroundColor: ['blue', 'yellow', 'green'],//row colors
+                    backgroundColor: ['green'],//row colors
                 }]
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+                indexAxis: 'x', // make it horizontal
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function (context) {
+                                const index = context[0].dataIndex;
+                                //provide a custom values for title attribute(per row)
+                                const customTitles = inputHandler(QUERY_TYPE, chartData);
+                                return customTitles[index] || context[0].label;
+                            }
+                        }
                     }
                 }
             }
@@ -118,8 +133,12 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
                     .then(function(results) {
                         let data = [];
                         results.forEach(function(result) {//write api response to array['inputID' => response]
-                            data[result.id] = result.data.total;
+                            data[result.id] = {
+                                'total': result.data.total,
+					            'user_query': result.user_query,
+                            };
                         });
+                        console.log('___results with query : ', results);
                         loadChartByData(data);//create chart
                     })
                     .catch(function(error) {
@@ -154,6 +173,7 @@ define('dashboard-items/tutorial', ['underscore', 'jquery', 'wrm/context-path'],
 
     DashboardItem.prototype.renderEdit = function (context, preferences) {
         userInputIDS = ['uq_1', 'uq_2', 'uq_3'];//set user inputs id's to base state
+        elIdSequence = 4;
         var $element = this.$element = $(context).find("#dynamic-content");
         $element.empty().html(Dashboard.Item.Tutorial.Templates.Configuration());
         this.API.once("afterRender", this.API.resize);

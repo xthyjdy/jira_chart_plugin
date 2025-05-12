@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.example.plugins.tutorial</groupId>
     <artifactId>dashboard-item-tutorial</artifactId>
-    <version>1.73-SNAPSHOT</version>
+    <version>1.91-SNAPSHOT</version>
 
     <organization>
         <name>Pix Software</name>
