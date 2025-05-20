@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.example.plugins.tutorial</groupId>
     <artifactId>dashboard-item-tutorial</artifactId>
-    <version>1.91-SNAPSHOT</version>
+    <version>1.92-SNAPSHOT</version>
 
     <organization>
         <name>Pix Software</name>
@@ -16,6 +16,31 @@
     <name>Chart Example</name>
     <description>This is the com.example.plugins.tutorial:dashboard-item-tutorial plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
+
+    <!-- add it to my ubuntu machine -->
+    <repositories>
+        <repository>
+            <id>maven-central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>jboss</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+        <repository>
+            <id>atlassian-plugin-sdk</id>
+            <url>file://${env.ATLAS_HOME}/repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+    <!-- end of - add it to my ubuntu machine -->
 
     <dependencies>
         <dependency>
